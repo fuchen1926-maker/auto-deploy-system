@@ -1,3 +1,4 @@
+cat >/opt/auto-deploy-system/deploy.sh <<'EOF'
 #!/bin/bash
 set -e
 
@@ -75,12 +76,11 @@ HOST_IP="172.17.0.1"
 echo "=== 7. 生成 Nginx 配置 ==="
 NGINX_CONF="/opt/1panel/apps/openresty/openresty/conf/conf.d/$DOMAIN.conf"
 
-cat > $NGINX_CONF <<EOF
+cat > $NGINX_CONF <<NGX
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
 
-    # 前端目录
     root $FRONT_DIST;
     index index.html;
 
@@ -88,7 +88,6 @@ server {
         try_files \$uri /index.html;
     }
 
-    # 后端反向代理
     location /api/ {
         proxy_pass http://$HOST_IP:$PORT/api/;
         proxy_set_header Host \$host;
@@ -96,7 +95,7 @@ server {
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
 }
-EOF
+NGX
 
 echo "=== 8. 重载 OpenResty（1Panel 内） ==="
 docker exec $CID nginx -t
@@ -106,3 +105,4 @@ echo ""
 echo "🎉 部署完成：http://$DOMAIN"
 echo "👉 如需 HTTPS：请到 1Panel → SSL 添加证书"
 echo ""
+EOF
