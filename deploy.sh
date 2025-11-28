@@ -1,4 +1,3 @@
-cat >/opt/auto-deploy-system/deploy.sh <<'EOF'
 #!/bin/bash
 set -e
 
